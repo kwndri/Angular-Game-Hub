@@ -1,0 +1,29 @@
+<app-searchbar />
+<div class="relative w-full h-[50vh]" *ngIf="details() as details">
+    <img
+        src="{{details.background_image}}"
+        alt="Game Background"
+        class="w-full h-full object-fit"
+  />
+  <div class="absolute left-1/2 top-[60%] transform -translate-x-1/2 -translate-y-1/2 text-center text-white px-4 flex flex-col w-[100vw]">
+    <h2 class="md:text-6xl text-4xl font-bold">{{ details.name }}</h2>
+    <div class="flex flex-row justify-evenly">
+      <div></div>
+      <p class="mt-2 text-xl max-w-2xl">Realease: {{ details.released | date }}</p>
+      <ngx-gauge class="gauge"
+  [type]="'semi'"
+  [value]="details.metacritic"
+  [thick]="20"             
+  [size]="150"
+  [foregroundColor]="color()"
+></ngx-gauge>
+    </div>
+    
+  </div>
+</div>
+<app-game-tabs 
+  *ngIf="details() as gameDetails" 
+  [details]="gameDetails" 
+  [screenshots]="screenshots()"
+  [trailers]="trailers()">
+</app-game-tabs>

@@ -1,0 +1,52 @@
+<div class="min-h-[500px] flex items-center justify-center bg-black text-white ">
+  <div class="flex flex-col gap-5 p-6 border border-blue-700 rounded-2xl bg-gray-900  max-w-[1300px] shadow-lg w-[600px]">
+    
+    
+    <a class="text-5xl font-bold text-blue-700 text-center">NgVGDB</a>
+    
+    
+    <form class="flex flex-col gap-4 w-[400px] mx-auto " [formGroup]='form'>
+      <div class="flex flex-col gap-2">
+        <label for="username" class="mb-1 text-md font-medium font-bold ">Username</label>
+        <input
+          id="username"
+          type="text"
+          class="px-4 py-2 rounded-md bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          formControlName="username"
+          name="username"
+        />
+        <div *ngIf="userName?.touched &&  userName?.errors?.['required']" class="bg-red-100 border my-[10px] border-red-400 text-red-700 px-4 py-2 rounded-lg relative text-md">
+            Username is required.
+        </div>
+      </div>
+      <div class="flex flex-col my-[10px] gap-2">
+        <label for="username" class="mb-1 text-md font-medium font-bold ">Password</label>
+        <input
+          id="password"
+          type="password"
+          name="password"
+          formControlName="password"
+          class="px-4 py-2 rounded-md bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          
+        <div *ngIf="password?.touched  && password?.errors?.['required']" class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative text-sm">
+            Username is required.
+        </div>
+        <button
+            (click)="onSubmit()"
+            type="submit"
+            [disabled]="form.invalid"
+            class="mt-4 px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold transition duration-300 disabled:opacity-50"
+        >
+            Login
+        </button>
+      </div>
+    </form>
+    @if(error()) {
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative text-md text-center">
+            {{error()}}
+    </div>
+    }
+    
+  </div>
+</div>

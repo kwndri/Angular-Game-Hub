@@ -1,0 +1,60 @@
+/* You can add global styles to this file, and also import other style files */
+@import "@angular/material/prebuilt-themes/azure-blue.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body { 
+    height: 100%;
+    background-color: black;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+ }
+body { 
+    margin: 0;  
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    padding: 0;
+    box-sizing: border-box;
+}
+mat-tab-header {
+  background-color: #e5109a8a !important; 
+  margin-top: 20px;
+  margin-left:10px;
+  margin-right:10px
+}
+
+mat-tab-group {
+  background-color: #3d3476e2 !important; 
+  position: relative;
+  top: -20px; /* Adjust this value to move it higher */ 
+  overflow-y: hidden !important;
+  
+  
+}
+
+mat-tab-group::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;      /* height of the semi-transparent area */
+  opacity: 0.05;
+  pointer-events: none;  /* so clicks go through */
+  z-index: 10;
+}
+
+.custom-tabs .mat-tab-label {
+  color: #e5e7eb !important; /* light gray */
+  transition: color 0.3s ease;
+}
+
+
+.custom-tabs .mat-tab-body-wrapper {
+  background-color: #111827 !important; /* darker gray */
+  padding: 1rem !important;
+  overflow-y: hidden !important;
+  height: auto !important;
+}
+
+

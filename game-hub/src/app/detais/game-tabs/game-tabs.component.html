@@ -1,0 +1,41 @@
+<div class="max-w-[1300px] w-[80vw] mx-auto ">
+    <mat-tab-group mat-align-tabs="start" class="custom-tabs" >
+        <mat-tab label="About" >
+            <div class="flex flex-col gap-3 mt-5 ml-3 pl-5 pr-5">
+            <div class="flex flex-row gap-2 ">
+                <p class=" text-white ">Platforms:</p>
+                <div class="flex flex-row gap-3">
+                    @for(platform of details()?.parent_platforms; track platform.platform.id) {
+                         <p  class=" text-white">{{platform.platform.name}}</p>
+                    }
+                </div>
+            </div>
+            <div class="flex flex-row gap-2 ">
+                <p class=" text-white ">Publishers:</p>
+                <div class="flex flex-row gap-3">
+                    @for(publisher of details()?.publishers; track publisher.name) {
+                         <p  class=" text-white">{{publisher.name}}</p>
+                    }
+                </div>
+            </div>
+            <div class="flex flex-row gap-2 ">
+                <p class=" text-white ">Website:</p>
+                <a class="text-white underline" href="{{details()?.website}}" target="_blank">{{details()?.website}}</a>
+            </div>
+            <p class="text-white" >{{details()?.description}}</p>
+        </div>
+        </mat-tab>
+        <mat-tab label="Screenshots">
+            @if(screenshots()?.results) {
+                <div class="grid grid-cols-2  ">
+                @for(screenshot of screenshots()?.results; track screenshot.id){
+                    <img src="{{screenshot.image}}" class="px-[20px] py-[20px]">
+            }
+            </div>
+            }
+        </mat-tab>
+        @if(trailers()) {
+            <mat-tab label="Trailers"></mat-tab>
+        }
+    </mat-tab-group>
+</div>

@@ -1,0 +1,19 @@
+.custom-tabs .mat-tab-header {
+  background-color: #1f2937; /* dark gray */
+}
+
+.custom-tabs .mat-tab-label {
+  color: #e5e7eb; /* light gray */
+  transition: color 0.3s ease;
+}
+
+.custom-tabs .mat-tab-label.mat-tab-label-active {
+  color: #facc15; /* yellow */
+  font-weight: 600;
+}
+
+.custom-tabs .mat-tab-body-wrapper {
+  background-color: #111827; /* darker gray */
+  padding: 1rem;
+}
+
