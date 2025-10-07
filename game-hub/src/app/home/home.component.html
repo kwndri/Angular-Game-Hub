@@ -1,10 +1,8 @@
-<app-searchbar />
-
 @if(isAuthenticated()) {
 
-  <div class="grid xl:grid-cols-[1fr_6fr] grid-cols-[1fr_5fr] gap-[20px] mb-[70px]">
+  <div class="grid xl:grid-cols-[1fr_6fr] grid-cols-[1fr_5fr] gap-[20px] mb-[70px] ">
     <app-genre-menu-component (selectedGenre)="onSelectGenre($event)"></app-genre-menu-component>
-    <div>
+    <div class="">
     @if(isLoading()) {
       <div class="flex items-center justify-center h-screen -mt-20 ">
         <mat-spinner diameter="50"></mat-spinner>

@@ -124,6 +124,7 @@ export class HomeComponent implements OnInit {
   }
 
   onSelectGame(id: number) {
+    console.log(id);
     this.router.navigate(['details', id.toString()]);
   }
 
