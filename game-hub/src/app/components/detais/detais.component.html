@@ -1,29 +1,52 @@
-<app-searchbar />
-<div class="relative w-full h-[50vh]" *ngIf="details() as details">
-    <img
-        src="{{details.background_image}}"
-        alt="Game Background"
-        class="w-full h-full object-fit"
-  />
-  <div class="absolute left-1/2 top-[60%] transform -translate-x-1/2 -translate-y-1/2 text-center text-white px-4 flex flex-col w-[100vw]">
-    <h2 class="md:text-6xl text-4xl font-bold">{{ details.name }}</h2>
-    <div class="flex flex-row justify-evenly">
-      <div></div>
-      <p class="mt-2 text-xl max-w-2xl">Realease: {{ details.released | date }}</p>
-      <ngx-gauge class="gauge"
-  [type]="'semi'"
-  [value]="details.metacritic"
-  [thick]="20"             
-  [size]="150"
-  [foregroundColor]="color()"
-></ngx-gauge>
+<div class="lg:grid lg:grid-cols-2 gap-[60px] mt-[60px] px-[20px] flex flex-col bg-gradient-to-r from-zinc-900 via-gray-500 to-zinc-700">
+  <div class="flex flex-col gap-[20px]">
+    <h1 class="text-white font-sans font-bold text-4xl">{{details()?.name}}</h1>
+    <p class="text-white">{{setDescription(details()?.description_raw)}}
+      <button (click)='onClickDescription()' 
+        class="px-[4px] py-[5px] mt-[2px] text-xs font-semibold bg-yellow-300 text-black rounded-lg ml-[4px]">
+        {{showLess()? 'Show More': 'Show Less'}}
+      </button>
+    </p>
+    <div class="grid grid-cols-2 gap-[30px]">
+      <div class="flex flex-col gap-[8px]">
+        <h3 class="text-lg text-gray-600 font-bold">Platforms</h3>
+          @for(platform of details()?.parent_platforms ?? [];; track platform.platform.id) {
+          <p class="text-white">{{platform.platform.name}}</p>
+          }
+      </div>
+      <div class="flex flex-col gap-[8px] font-bold">
+        <h3 class="text-lg text-gray-600">Metacritic</h3>
+        <app-critic-score-component [metacritic]="details()?.metacritic"></app-critic-score-component>
+      </div>
+      <div class="flex flex-col gap-[8px] font-bold">
+        <h3 class="text-lg text-gray-600">Genres</h3>
+         @for(genre of details()?.genres ?? [];; track genre.id) {
+          <p class="text-white">{{genre.name}}</p>
+          }
+      </div>
+      <div class="flex flex-col gap-[8px]">
+        <h3 class="text-lg text-gray-600 font-bold">Genres</h3>
+         @for(publisher of details()?.publishers ?? [];; track publisher.name) {
+          <p class="text-white">{{publisher.name}}</p>
+          }
+      </div>
     </div>
-    
+  </div>
+ 
+  <div class="flex flex-col gap-[20px]">
+     @if(videoSrc && videoPoster){
+       <video
+      src={{videoSrc}}
+      poster={{videoPoster}}
+      controls
+      width="100%"
+      height="auto"
+    ></video>
+  }
+    <div class="md:grid md:grid-cols-2 gap-[8px] flex flex-col mb-[50px]">
+      @for(screenshot of screenshots()?.results || []; track screenshot.id){
+        <img src="{{screenshot.image}}" class="w-full h-full object cover">
+      }
+    </div>
   </div>
 </div>
-<app-game-tabs 
-  *ngIf="details() as gameDetails" 
-  [details]="gameDetails" 
-  [screenshots]="screenshots()"
-  [trailers]="trailers()">
-</app-game-tabs>

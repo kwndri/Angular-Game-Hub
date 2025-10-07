@@ -25,6 +25,8 @@ export interface GameDetails {
   publishers: Publishers[];
   website: string;
   metacritic: number;
+  description_raw: string;
+  genres: Genre[];
   // Add other fields you expect from the API...
 }
 export interface ApiResponse {
@@ -71,8 +73,13 @@ interface ScreenshotResult {
 }
 
 interface TrailerResult {
-  url: string;
   id: number;
+  name: string;
+  preview: string;
+  data: {
+    480: string;
+    max: string;
+  };
 }
 
 export interface GamePlatform {

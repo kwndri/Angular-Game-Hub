@@ -13,6 +13,7 @@ import { GameDetails, Screenshots, Trailer } from '../../../models/game.model';
 import { SearchbarComponent } from '../searchbar/searchbar.component';
 import { GameTabsComponent } from '../../detais/game-tabs/game-tabs.component';
 import { NgxGaugeModule } from 'ngx-gauge';
+import { CriticScoreComponent } from '../critic-score-component/critic-score-component';
 
 @Component({
   standalone: true,
@@ -23,6 +24,7 @@ import { NgxGaugeModule } from 'ngx-gauge';
     SearchbarComponent,
     GameTabsComponent,
     NgxGaugeModule,
+    CriticScoreComponent,
   ],
   templateUrl: './detais.component.html',
   styleUrl: './detais.component.css',
@@ -35,17 +37,21 @@ export class DetailsComponent implements OnInit {
   screenshots = signal<Screenshots | undefined>(undefined);
   private error = signal('');
   private activatedRoute = inject(ActivatedRoute);
-  gameId = input<string>();
+  gameId = input.required<string>();
   id = signal<string>('');
   color = signal('');
+  showLess = signal<boolean>(true);
 
   ngOnInit() {
     const subscription = this.activatedRoute.params.subscribe(
       (params: Params) => {
         this.id.set(params['id']);
-        this.searchGameDetails(this.id());
-        this.searchGameTrailers(this.id());
-        this.searchGameScreenshots(this.id());
+        if (this.gameId()) {
+          this.searchGameDetails(this.gameId());
+          this.searchGameTrailers(this.gameId());
+          this.searchGameScreenshots(this.gameId());
+        }
+
         console.log(this.gameId());
       }
     );
@@ -114,5 +120,33 @@ export class DetailsComponent implements OnInit {
       let new_color = this.gameService.getColor(this.details()?.metacritic);
       this.color.set(new_color);
     }
+  }
+
+  setDescription(description: string | undefined) {
+    if (this.showLess() && description) {
+      return `${description.substring(0, 300)}...`;
+    } else {
+      return `${description} `;
+    }
+  }
+
+  onClickDescription() {
+    this.showLess.set(!this.showLess());
+  }
+
+  get videoSrc() {
+    const results = this.trailers()?.results;
+    if (results && results.length > 0 && results[0]?.data?.[480]) {
+      return results[0].data[480];
+    }
+    return '';
+  }
+
+  get videoPoster() {
+    const results = this.trailers()?.results;
+    if (results && results.length > 0 && results[0]?.preview) {
+      return results[0].preview;
+    }
+    return '';
   }
 }
