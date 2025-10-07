@@ -1,0 +1,14 @@
+<div class="flex flex-col mt-[30px] pl-[20px] gap-[20px]">
+    <h2 class="font-bold text-white font-sans text-3xl">Genres</h2>
+    <div class="flex flex-col gap-[15px]">
+        @for(genre of genres(); track genre.id){
+
+            <div class="flex flex-row gap-[10px]">
+                <div class="w-[30px] h-[30px]">
+                    <img [src]="genre.image_background" class="w-full h-full object-cover rounded-lg">
+                </div>
+                <button class="text-white self-center text-lg hover:underline" (click)="onClick(genre)">{{genre.name}}</button>
+            </div>
+        }
+    </div>
+</div>
