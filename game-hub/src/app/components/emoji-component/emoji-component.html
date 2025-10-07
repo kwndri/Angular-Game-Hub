@@ -1,0 +1,17 @@
+<div *ngIf="metacritic() != null" class="mt-4">
+  <img 
+    [src]="
+      metacritic()! > 75 ? 'bulls-eye.webp' : 
+      metacritic()! > 60 ? 'thumbs-up.webp' : 
+      'sad.webp'
+    " 
+    class="w-[30px] h-[30px] object-contain" 
+  />
+</div>
+
+<div *ngIf="metacritic() == null || metacritic() == undefined" class="mt-4">
+  <img 
+    src="meh.webp" 
+    class="w-[30px] h-[30px] object-contain" 
+  />
+</div>
