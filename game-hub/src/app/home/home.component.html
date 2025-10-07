@@ -1,66 +1,91 @@
 <app-searchbar />
+
 @if(isAuthenticated()) {
-  @if(isLoading()) {
-    <div class="flex items-center justify-center h-screen -mt-20">
-      <mat-spinner diameter="50"></mat-spinner>
+
+  <div class="grid xl:grid-cols-[1fr_6fr] grid-cols-[1fr_5fr] gap-[20px] mb-[70px]">
+    <app-genre-menu-component (selectedGenre)="onSelectGenre($event)"></app-genre-menu-component>
+    <div>
+    @if(isLoading()) {
+      <div class="flex items-center justify-center h-screen -mt-20 ">
+        <mat-spinner diameter="50"></mat-spinner>
       </div>
-  } @else {
-
-  
-  <div  class="flex flex-row mx-auto max-w-[1400px] mt-10">
-  <div class="px-4 min-h-screen w-full">
-    <div class="rounded-xl">
-      <mat-form-field appearance="fill" >
-        <mat-label>Sort</mat-label>
-        <mat-select
-          panelClass="sort-select"
-          [(ngModel)]="sort"
-          name="sort"
-          (selectionChange)="searchGames(sort)"
-        >
-          <mat-option value="-released">Released</mat-option>
-          <mat-option value="-added">Added</mat-option>
-          <mat-option value="-created">Created</mat-option>
-          <mat-option value="-updated">Updated</mat-option>
-          <mat-option value="-rating">Rating</mat-option>
-          <mat-option value="metacritic">Metacritic</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-    <section
-      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[25px] mt-[25px] "
-    >
-      @for(game of games(); track game.id) {
-        <div
-          class="border rounded-2xl shadow-[0_8px_25px_rgba(255,85,85,0.2)] overflow-hidden bg-black flex flex-col mt-[9px] w-full transition-transform duration-300 hover:scale-105 hover:shadow-[0_12px_40px_rgba(255,85,85,0.3)] hover:bg-zinc-900"
-          style="max-height: 400px;"
-          (click) = "onSelectGame(game.id)"
-        >
-          <div class="bg-white h-[200px]">
-            <img
-              src="{{game.background_image}}"
-              alt="{{game.name}}"
-              class="w-full h-full object-contain"
-            />
+    } @else {
+      <div class="flex flex-row gap-[10px] mt-[80px]  px-4">
+        @if(selectedPlatform()){
+          <h1 class="text-white font-bold font-sans text-6xl">{{selectedPlatform()}}</h1>
+        }
+        @if(selectedGenre){
+          <h1 class="text-white font-bold font-sans text-6xl">{{selectedGenre.name}}</h1>
+        }
+        <h1 class="text-white font-bold font-sans text-6xl">Games</h1>
+      </div>
+      <div class="flex flex-row gap-[30px] mt-[40px] mb-[20px] px-[20px]">
+          <!-- Sort Selector -->
+          <div class="rounded-xl">
+            <mat-form-field appearance="fill">
+              <mat-label>Sort</mat-label>
+              <mat-select [(ngModel)]="sort" name="sort" (selectionChange)="onSortOrPlatformChange()">
+                <mat-option value="-released">Released</mat-option>
+                <mat-option value="-added">Added</mat-option>
+                <mat-option value="-created">Created</mat-option>
+                <mat-option value="-updated">Updated</mat-option>
+                <mat-option value="-rating">Rating</mat-option>
+                <mat-option value="-metacritic">Metacritic</mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
-          <div class="mt-4 p-6">
-            <h2 class="text-xl font-bold text-white mb-4">{{game.name}}</h2>
-            <div class="flex flex-row">
-                @for(platform of game.parent_platforms; track platform.platform.id) {
-                    <img
-                src="{{platform.platform.slug}}.svg"
-                alt="Xbox Logo"
-                class="w-[20px] h-8 mr-[10px] "
-              />
+
+          <!-- Platform Selector -->
+          <div class="rounded-xl">
+            <mat-form-field appearance="fill">
+              <mat-label>Platform</mat-label>
+              <mat-select [(ngModel)]="platform" name="platform" (selectionChange)="onSortOrPlatformChange()">
+                <mat-option value="">All</mat-option>
+                @for(platform of platforms(); track platform.id) {
+                  <mat-option value="{{platform.id}}">{{platform.name}}</mat-option>
                 }
-              
-            </div>
+              </mat-select>
+            </mat-form-field>
           </div>
         </div>
-      }
-    </section>
+
+        <!-- Game Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[25px] mt-[25px] px-[20px] ">
+    <div *ngFor="let game of games() ?? []" 
+        class="border rounded-2xl shadow-[0_8px_25px_rgba(255,85,85,0.2)] overflow-hidden bg-black flex flex-col mt-[9px] w-full transition-transform duration-300 hover:scale-105 hover:shadow-[0_12px_40px_rgba(255,85,85,0.3)] hover:bg-zinc-900"
+        style="max-height: 400px;" 
+        (click)="onSelectGame(game.id)">
+      
+      <div class="bg-white h-[200px] rounded-2xl">
+        @if(game.background_image){
+          <img src="{{game.background_image}}" alt="{{game.name}}" class="w-full h-full object-cover " />
+        }@else {
+          <img src="no-image-placeholder-6f3882e0.webp" alt="{{game.name}}" class="w-full h-full object-cover" />
+        }
+        
+      </div>
+
+      <div class="mt-4 p-6">
+        <h2 class="text-xl font-bold text-white mb-4">{{game.name}}</h2>
+        <div class="flex flex-row justify-between mb-4 items-center">
+          <div class="flex flex-row gap-[5px] flex-wrap">
+              <div *ngFor="let platform of game.parent_platforms ?? []">
+                <img [src]="platform.platform.slug + '.svg'"
+                  [alt]="platform.platform.name"
+                  class="w-[20px] h-8 mr-[10px]">
+              </div>
+          </div>
+          <app-critic-score-component [metacritic]="game.metacritic"></app-critic-score-component>
+        </div>
+        <app-emoji-component [metacritic]="game.metacritic"></app-emoji-component>
+      </div>
+    </div>
+    </div>
+    <div class="flex flex-row justify-between gap-[20px] mt-[30px] px-4 mb-[30px]">
+      <button class="py-2 px-3 text-center  font-sans rounded-xl text-lg" [class]="previous()? 'bg-blue-700 text-white hover:bg-blue-500':'bg-gray-300 text-gray-400'" [disabled]="!previous()" (click)="onPreviousPage()">Previous Page</button>
+      <button class="py-2 px-3 text-center text-white font-sans rounded-xl text-lg" [class]="next()? 'bg-blue-700 text-white hover:bg-blue-500':'bg-gray-300 text-gray-400'" [disabled]="!next()" (click)="onLoadMore()">Next Page</button>
+    </div>
+    }
+    </div>
   </div>
-</div>
-  }
 }

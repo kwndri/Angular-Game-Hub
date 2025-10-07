@@ -29,11 +29,9 @@ export interface GameDetails {
 }
 export interface ApiResponse {
   count: number;
+  next: string;
+  previous: string;
   results: Game[];
-}
-
-interface Genre {
-  name: string;
 }
 
 interface ParentPlatform {
@@ -75,4 +73,27 @@ interface ScreenshotResult {
 interface TrailerResult {
   url: string;
   id: number;
+}
+
+export interface GamePlatform {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface PlatformsResponse {
+  count: number;
+  results: GamePlatform[];
+}
+
+export interface Genre {
+  id: number;
+  name: string;
+  slug: string;
+  image_background: string;
+}
+
+export interface GenreResponse {
+  count: number;
+  results: Genre[];
 }
