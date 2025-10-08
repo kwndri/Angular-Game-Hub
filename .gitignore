@@ -9,3 +9,5 @@ node_modules/
 # Ignore build/dist folders if you want (optional)
 dist/
 build/
+
+game-hub/src/enviroment.ts
