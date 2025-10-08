@@ -41,7 +41,7 @@ testem.log
 .DS_Store
 Thumbs.db
 
-/src/environment.ts
+/game-hub/src/environment.ts
 
 # Angular
 dist/
