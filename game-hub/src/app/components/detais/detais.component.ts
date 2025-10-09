@@ -12,7 +12,6 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { GameDetails, Screenshots, Trailer } from '../../../models/game.model';
 import { SearchbarComponent } from '../searchbar/searchbar.component';
 import { GameTabsComponent } from '../../detais/game-tabs/game-tabs.component';
-import { NgxGaugeModule } from 'ngx-gauge';
 import { CriticScoreComponent } from '../critic-score-component/critic-score-component';
 
 @Component({
@@ -23,7 +22,6 @@ import { CriticScoreComponent } from '../critic-score-component/critic-score-com
     DatePipe,
     SearchbarComponent,
     GameTabsComponent,
-    NgxGaugeModule,
     CriticScoreComponent,
   ],
   templateUrl: './detais.component.html',
