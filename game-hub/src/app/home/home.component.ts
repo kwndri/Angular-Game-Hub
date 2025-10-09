@@ -208,7 +208,11 @@ export const resolveGenreName: ResolveFn<string> = (
   routerState: RouterStateSnapshot
 ) => {
   const genre = activatedRoute.queryParams['genre'];
-  const genreName = genre[0].toUpperCase() + genre.slice(1, genre.length);
-
-  return genreName || '';
+  if (genre) {
+    const genreName = genre[0].toUpperCase() + genre.slice(1, genre.length);
+    return genreName;
+  } else {
+    const genreName = '';
+    return genreName;
+  }
 };
