@@ -12,8 +12,8 @@
         @if(selectedPlatform()){
           <h1 class="text-white font-bold font-sans text-6xl">{{selectedPlatform()}}</h1>
         }
-        @if(selectedGenre){
-          <h1 class="text-white font-bold font-sans text-6xl">{{selectedGenre.name}}</h1>
+        @if(genreName()){
+          <h1 class="text-white font-bold font-sans text-6xl">{{genreName()}}</h1>
         }
         <h1 class="text-white font-bold font-sans text-6xl">Games</h1>
       </div>

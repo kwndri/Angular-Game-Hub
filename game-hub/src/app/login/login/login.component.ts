@@ -45,7 +45,7 @@ export class LoginComponent {
             console.log(response);
             this.authService.setLoggedIn(true);
             this.authService.saveToken(response.token);
-            this.router.navigate(['/']);
+            this.router.navigate(['/'], { replaceUrl: true });
           },
           error: (error: Error) => {
             this.error.set(error.message);

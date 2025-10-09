@@ -1,6 +1,13 @@
 import { Component, DestroyRef, inject, output, signal } from '@angular/core';
 import { Genre, GenreResponse } from '../../../models/game.model';
 import { Gameservice } from '../../services/gameservice';
+import {
+  ActivatedRoute,
+  ActivatedRouteSnapshot,
+  ResolveFn,
+  Router,
+  RouterStateSnapshot,
+} from '@angular/router';
 
 @Component({
   selector: 'app-genre-menu-component',
@@ -13,6 +20,8 @@ export class GenreMenuComponent {
   private gameService = inject(Gameservice);
   private destroRef = inject(DestroyRef);
   selectedGenre = output<Genre>();
+  private activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
 
   ngOnInit(): void {
     const subscription = this.gameService
@@ -29,5 +38,11 @@ export class GenreMenuComponent {
 
   onClick(genre: Genre) {
     this.selectedGenre.emit(genre);
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams: { genre: genre.slug || null },
+      queryParamsHandling: 'merge', // merge with existing query params
+      replaceUrl: true, // optional, avoids adding to browser history
+    });
   }
 }

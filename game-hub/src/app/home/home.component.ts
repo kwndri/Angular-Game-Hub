@@ -1,11 +1,25 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  inject,
+  input,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Gameservice } from '../services/gameservice';
 import { Game, GamePlatform, Genre } from '../../models/game.model';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import {
+  ActivatedRoute,
+  ActivatedRouteSnapshot,
+  Params,
+  ResolveFn,
+  Router,
+  RouterStateSnapshot,
+} from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SearchbarComponent } from '../components/searchbar/searchbar.component';
 import { Authervice } from '../services/authService';
@@ -51,29 +65,55 @@ export class HomeComponent implements OnInit {
   isAuthenticated = this.authService.isLoggedIn;
   selectedGenre: Genre | undefined;
   selectedPlatform = signal('');
+  genreName = signal<string>('');
 
   ngOnInit(): void {
-    const subscription = this.activatedRoute.params.subscribe(
-      (params: Params) => {
-        const searchTerm = params['gameSearch'] || undefined;
-        this.search.set(searchTerm);
-        this.searchGames(
-          'https://api.rawg.io/api/games',
-          this.sort,
-          this.platform || undefined,
-          searchTerm
+    const resolverData = this.activatedRoute.snapshot.data['genreName'];
+    if (resolverData) {
+      this.genreName.set(resolverData); // if you want to store it in your signal
+      console.log(resolverData);
+    }
+
+    const querySub = this.activatedRoute.queryParams.subscribe((params) => {
+      const platformFromUrl =
+        params['platform'] || ''; /*check from the params if any platform 
+                                                or search is selected*/
+      this.platform = platformFromUrl; //set the selected platform if any
+      const searchTerm = params['gameSearch'] || undefined;
+      this.search.set(searchTerm);
+      const genreFromUrl = params['genre'] || undefined;
+      if (genreFromUrl) {
+        this.genreName.set(
+          genreFromUrl[0].toUpperCase() +
+            genreFromUrl.slice(1, genreFromUrl.length)
         );
       }
-    );
+
+      this.searchGames(
+        //make the request based on the info from the params
+        'https://api.rawg.io/api/games',
+        this.sort,
+        this.platform || undefined,
+        searchTerm,
+        genreFromUrl || undefined
+      );
+    });
 
     const platformSub = this.gameService
       .getPlatforms('Cannot retrieve platforms')
       .subscribe({
-        next: (res) => this.platforms.set(res),
+        next: (res) => {
+          this.platforms.set(res);
+          this.selectedPlatform.set(this.platformName(this.platform));
+        },
+        //find the name of the selected platform if any
         error: (err) => console.error(err),
       });
 
-    this.destroRef.onDestroy(() => subscription.unsubscribe());
+    this.destroRef.onDestroy(() => {
+      querySub.unsubscribe();
+      platformSub.unsubscribe();
+    });
   }
 
   searchGames(
@@ -116,6 +156,13 @@ export class HomeComponent implements OnInit {
   onSortOrPlatformChange() {
     this.selectedPlatform.set(this.platformName(this.platform));
     console.log(this.selectedPlatform());
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams: { platform: this.platform || null },
+      queryParamsHandling: 'merge', // merge with existing query params
+      replaceUrl: true, // optional, avoids adding to browser history
+    });
+
     this.searchGames(
       'https://api.rawg.io/api/games',
       this.sort,
@@ -170,3 +217,18 @@ export class HomeComponent implements OnInit {
     return '';
   }
 }
+
+export const resolveGenreName: ResolveFn<string> = (
+  //function to retrieve dynamic data from the url (the genre name from the slug in the url)
+  activatedRoute: ActivatedRouteSnapshot,
+  routerState: RouterStateSnapshot
+) => {
+  const slug = activatedRoute.paramMap.get('genre') || '';
+  console.log(slug);
+
+  if (slug) {
+    return slug[0].toUpperCase() + slug.slice(1, slug.length);
+  } else {
+    return '';
+  }
+};
