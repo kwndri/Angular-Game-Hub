@@ -8,22 +8,14 @@ import {
 } from '@angular/core';
 import { Gameservice } from '../../services/gameservice';
 import { ActivatedRoute, Params } from '@angular/router';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { GameDetails, Screenshots, Trailer } from '../../../models/game.model';
-import { SearchbarComponent } from '../searchbar/searchbar.component';
-import { GameTabsComponent } from '../../detais/game-tabs/game-tabs.component';
 import { CriticScoreComponent } from '../critic-score-component/critic-score-component';
 
 @Component({
   standalone: true,
   selector: 'app-detais',
-  imports: [
-    CommonModule,
-    DatePipe,
-    SearchbarComponent,
-    GameTabsComponent,
-    CriticScoreComponent,
-  ],
+  imports: [CommonModule, CriticScoreComponent],
   templateUrl: './detais.component.html',
   styleUrl: './detais.component.css',
 })

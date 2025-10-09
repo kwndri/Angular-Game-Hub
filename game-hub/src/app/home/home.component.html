@@ -65,12 +65,12 @@
 
       <div class="mt-4 p-6">
         <h2 class="text-xl font-bold text-white mb-4">{{game.name}}</h2>
-        <div class="flex flex-row justify-between mb-4 items-center">
+        <div class="flex flex-row justify-between mb-4 ">
           <div class="flex flex-row gap-[5px] flex-wrap">
               <div *ngFor="let platform of game.parent_platforms ?? []">
                 <img [src]="platform.platform.slug + '.svg'"
                   [alt]="platform.platform.name"
-                  class="w-[20px] h-8 mr-[10px]">
+                  class="w-[20px] h-[20px] mr-[10px]">
               </div>
           </div>
           <app-critic-score-component [metacritic]="game.metacritic"></app-critic-score-component>

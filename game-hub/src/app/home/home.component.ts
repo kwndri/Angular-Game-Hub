@@ -12,16 +12,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Gameservice } from '../services/gameservice';
 import { Game, GamePlatform, Genre } from '../../models/game.model';
-import {
-  ActivatedRoute,
-  ActivatedRouteSnapshot,
-  Params,
-  ResolveFn,
-  Router,
-  RouterStateSnapshot,
-} from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { SearchbarComponent } from '../components/searchbar/searchbar.component';
 import { Authervice } from '../services/authService';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CriticScoreComponent } from '../components/critic-score-component/critic-score-component';
@@ -37,7 +29,6 @@ import { GenreMenuComponent } from '../components/genre-menu-component/genre-men
     MatSelectModule,
     FormsModule,
     CommonModule,
-    SearchbarComponent,
     MatProgressSpinnerModule,
     CriticScoreComponent,
     EmojiComponent,
@@ -217,18 +208,3 @@ export class HomeComponent implements OnInit {
     return '';
   }
 }
-
-export const resolveGenreName: ResolveFn<string> = (
-  //function to retrieve dynamic data from the url (the genre name from the slug in the url)
-  activatedRoute: ActivatedRouteSnapshot,
-  routerState: RouterStateSnapshot
-) => {
-  const slug = activatedRoute.paramMap.get('genre') || '';
-  console.log(slug);
-
-  if (slug) {
-    return slug[0].toUpperCase() + slug.slice(1, slug.length);
-  } else {
-    return '';
-  }
-};
