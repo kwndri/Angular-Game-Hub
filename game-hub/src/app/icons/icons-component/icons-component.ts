@@ -10,8 +10,8 @@ import { IconProp, SizeProp } from '@fortawesome/fontawesome-svg-core';
   standalone: true,
   selector: 'app-icons',
   imports: [FaIconComponent],
-  templateUrl: './icons.component.html',
-  styleUrl: './icons.component.css',
+  templateUrl: './icons-component.html',
+  styleUrl: './icons-component.css',
 })
 export class IconsComponent {
   readonly iconPrefix = input<string>('fab');
