@@ -12,7 +12,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Gameservice } from '../services/gameservice';
 import { Game, GamePlatform, Genre } from '../../models/game.model';
-import { ActivatedRoute, Router } from '@angular/router';
+import {
+  ActivatedRoute,
+  ActivatedRouteSnapshot,
+  ResolveFn,
+  Router,
+  RouterStateSnapshot,
+} from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Authervice } from '../services/authService';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -56,15 +62,9 @@ export class HomeComponent implements OnInit {
   isAuthenticated = this.authService.isLoggedIn;
   selectedGenre: Genre | undefined;
   selectedPlatform = signal('');
-  genreName = signal<string>('');
+  genreName = input.required<string>();
 
   ngOnInit(): void {
-    const resolverData = this.activatedRoute.snapshot.data['genreName'];
-    if (resolverData) {
-      this.genreName.set(resolverData); // if you want to store it in your signal
-      console.log(resolverData);
-    }
-
     const querySub = this.activatedRoute.queryParams.subscribe((params) => {
       const platformFromUrl =
         params['platform'] || ''; /*check from the params if any platform 
@@ -73,12 +73,6 @@ export class HomeComponent implements OnInit {
       const searchTerm = params['gameSearch'] || undefined;
       this.search.set(searchTerm);
       const genreFromUrl = params['genre'] || undefined;
-      if (genreFromUrl) {
-        this.genreName.set(
-          genreFromUrl[0].toUpperCase() +
-            genreFromUrl.slice(1, genreFromUrl.length)
-        );
-      }
 
       this.searchGames(
         //make the request based on the info from the params
@@ -95,7 +89,6 @@ export class HomeComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.platforms.set(res);
-          this.selectedPlatform.set(this.platformName(this.platform));
         },
         //find the name of the selected platform if any
         error: (err) => console.error(err),
@@ -208,3 +201,14 @@ export class HomeComponent implements OnInit {
     return '';
   }
 }
+
+export const resolveGenreName: ResolveFn<string> = (
+  //function to retrieve dynamic data from the url (from the userId i am getting the username here)
+  activatedRoute: ActivatedRouteSnapshot,
+  routerState: RouterStateSnapshot
+) => {
+  const genre = activatedRoute.queryParams['genre'];
+  const genreName = genre[0].toUpperCase() + genre.slice(1, genre.length);
+
+  return genreName || '';
+};

@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './home/home.component';
+import { HomeComponent, resolveGenreName } from './home/home.component';
 import { DetailsComponent } from './components/detais/detais.component';
 import { LoginComponent } from './login/login/login.component';
 import { authGuard } from './guards/authGuard';
@@ -9,6 +9,10 @@ export const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
+    runGuardsAndResolvers: 'always',
+    resolve: {
+      genreName: resolveGenreName,
+    },
     canActivate: [authGuard],
   },
   {
