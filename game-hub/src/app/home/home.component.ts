@@ -1,6 +1,7 @@
 import {
   Component,
   DestroyRef,
+  effect,
   inject,
   input,
   OnInit,
@@ -44,14 +45,24 @@ import { GenreMenuComponent } from '../components/genre-menu-component/genre-men
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
+  gameQuery = signal({
+    sort: '-added',
+    platform: '',
+    search: '',
+    genre: '',
+  });
+
+  //Retrieving the query params using the input signals
+  sort = input<string | undefined>('-added');
+  platform = input<string | undefined>();
+  search = input<string | undefined>();
+  genre = input<string | undefined>();
+  selectedSort: string = '-added';
+  platformSelected: string = '';
   isLoading = signal<boolean>(true);
-  sort: string = '-added';
-  platform: string = '';
-  genre: string = '';
   games = signal<Game[] | undefined>(undefined);
   next = signal<string>('');
   previous = signal<string>('');
-  search = signal<string | undefined>('');
   private error = signal('');
   platforms = signal<GamePlatform[] | undefined>(undefined);
   private gameService = inject(Gameservice);
@@ -64,25 +75,46 @@ export class HomeComponent implements OnInit {
   selectedPlatform = signal('');
   genreName = input.required<string>();
 
-  ngOnInit(): void {
-    const querySub = this.activatedRoute.queryParams.subscribe((params) => {
-      const platformFromUrl =
-        params['platform'] || ''; /*check from the params if any platform 
-                                                or search is selected*/
-      this.platform = platformFromUrl; //set the selected platform if any
-      const searchTerm = params['gameSearch'] || undefined;
-      this.search.set(searchTerm);
-      const genreFromUrl = params['genre'] || undefined;
+  constructor() {
+    // Automatically fetch games whenever query state changes
+    effect(() => {
+      const { sort, platform, search, genre } = this.gameQuery();
+
+      // Don’t trigger before init or if query is incomplete
+      if (!sort) return;
 
       this.searchGames(
-        //make the request based on the info from the params
         'https://api.rawg.io/api/games',
-        this.sort,
-        this.platform || undefined,
-        searchTerm,
-        genreFromUrl || undefined
+        sort,
+        platform,
+        search,
+        genre
       );
     });
+  }
+  ngOnInit(): void {
+    //ANOTHER WAY TO RETRIEVE QUERY PARAMS USING OBSERVABLES
+
+    /*const querySub = this.activatedRoute.queryParams.subscribe((params) => {
+      const platformFromUrl = params['platform'] || '';
+      this.platform = platformFromUrl;
+      const searchTerm = params['gameSearch'] || undefined;
+      //this.search.set(searchTerm); 
+      // const genreFromUrl =params['genre'] || undefined;
+      this.gameQuery.update((state) => ({
+        ...state,
+        platform: platformFromUrl,
+        serach: searchTerm,
+        genre: genreFromUrl,
+      }));
+    });  */
+
+    this.gameQuery.update((state) => ({
+      ...state,
+      platform: this.platform() || '',
+      serach: this.search(),
+      genre: this.genre() || '',
+    }));
 
     const platformSub = this.gameService
       .getPlatforms('Cannot retrieve platforms')
@@ -90,12 +122,11 @@ export class HomeComponent implements OnInit {
         next: (res) => {
           this.platforms.set(res);
         },
-        //find the name of the selected platform if any
+
         error: (err) => console.error(err),
       });
 
     this.destroRef.onDestroy(() => {
-      querySub.unsubscribe();
       platformSub.unsubscribe();
     });
   }
@@ -138,20 +169,21 @@ export class HomeComponent implements OnInit {
   }
 
   onSortOrPlatformChange() {
-    this.selectedPlatform.set(this.platformName(this.platform));
-    console.log(this.selectedPlatform());
+    this.gameQuery.update((state) => ({
+      ...state,
+      sort: this.selectedSort,
+      platform: this.platformSelected,
+    }));
+    this.selectedPlatform.set(this.platformName(this.gameQuery().platform));
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
-      queryParams: { platform: this.platform || null },
+      queryParams: {
+        platform: this.platformSelected || null,
+        sort: this.selectedSort || null,
+      },
       queryParamsHandling: 'merge', // merge with existing query params
       replaceUrl: true, // optional, avoids adding to browser history
     });
-
-    this.searchGames(
-      'https://api.rawg.io/api/games',
-      this.sort,
-      this.platform || undefined
-    );
   }
 
   onSelectGame(id: number) {
@@ -160,33 +192,29 @@ export class HomeComponent implements OnInit {
   }
 
   onSelectGenre(genre: Genre) {
-    this.selectedGenre = genre;
-    this.searchGames(
-      'https://api.rawg.io/api/games',
-      this.sort,
-      this.platform || undefined,
-      undefined,
-      genre.slug
-    );
+    this.gameQuery.update((state) => ({
+      ...state,
+      genre: genre.slug,
+    }));
   }
 
   onLoadMore() {
     this.searchGames(
       this.next(),
-      this.sort,
-      this.platform || undefined,
-      this.search() || undefined,
-      this.genre || undefined
+      this.gameQuery().sort,
+      this.gameQuery().platform || undefined,
+      undefined,
+      this.gameQuery().genre || undefined
     );
   }
 
   onPreviousPage() {
     this.searchGames(
       this.previous(),
-      this.sort,
-      this.platform || undefined,
-      this.search() || undefined,
-      this.genre || undefined
+      this.gameQuery().sort,
+      this.gameQuery().platform || undefined,
+      undefined,
+      this.gameQuery().genre || undefined
     );
   }
 

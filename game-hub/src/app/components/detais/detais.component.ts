@@ -35,7 +35,7 @@ export class DetailsComponent implements OnInit {
   ngOnInit() {
     const subscription = this.activatedRoute.params.subscribe(
       (params: Params) => {
-        this.id.set(params['id']);
+        //this.id.set(params['id']); alternative way to get the id from url and set it to the component
         if (this.gameId()) {
           this.searchGameDetails(this.gameId());
           this.searchGameTrailers(this.gameId());
@@ -53,7 +53,7 @@ export class DetailsComponent implements OnInit {
 
   searchGameDetails(id: string): void {
     const subscription = this.gameService
-      .getGameDetails(id, 'Cannot retrieve game details')
+      .getGameDetails(this.gameId(), 'Cannot retrieve game details')
       .subscribe({
         next: (resData) => {
           this.details.set(resData);

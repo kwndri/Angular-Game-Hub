@@ -22,7 +22,7 @@
           <div class="rounded-xl">
             <mat-form-field appearance="fill">
               <mat-label>Sort</mat-label>
-              <mat-select [(ngModel)]="sort" name="sort" (selectionChange)="onSortOrPlatformChange()">
+              <mat-select [(ngModel)]="selectedSort" name="SelectedSort" (selectionChange)="onSortOrPlatformChange()">
                 <mat-option value="-released">Released</mat-option>
                 <mat-option value="-added">Added</mat-option>
                 <mat-option value="-created">Created</mat-option>
@@ -37,7 +37,7 @@
           <div class="rounded-xl">
             <mat-form-field appearance="fill">
               <mat-label>Platform</mat-label>
-              <mat-select [(ngModel)]="platform" name="platform" (selectionChange)="onSortOrPlatformChange()">
+              <mat-select [(ngModel)]="platformSelected" name="platformSelected" (selectionChange)="onSortOrPlatformChange()">
                 <mat-option value="">All</mat-option>
                 @for(platform of platforms(); track platform.id) {
                   <mat-option value="{{platform.id}}">{{platform.name}}</mat-option>
