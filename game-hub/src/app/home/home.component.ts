@@ -26,6 +26,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CriticScoreComponent } from '../components/critic-score-component/critic-score-component';
 import { EmojiComponent } from '../components/emoji-component/emoji-component';
 import { GenreMenuComponent } from '../components/genre-menu-component/genre-menu-component';
+import { GameQueryStore } from '../stores/gameQuery.store';
 
 @Component({
   standalone: true,
@@ -45,20 +46,9 @@ import { GenreMenuComponent } from '../components/genre-menu-component/genre-men
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
-  gameQuery = signal({
-    sort: '-added',
-    platform: '',
-    search: '',
-    genre: '',
-  });
-
-  //Retrieving the query params using the input signals
-  sort = input<string | undefined>('-added');
-  platform = input<string | undefined>();
-  search = input<string | undefined>();
-  genre = input<string | undefined>();
-  selectedSort: string = '-added';
-  platformSelected: string = '';
+  private gameQueryStore = inject(GameQueryStore);
+  sort: string = '-added';
+  platform: string = '';
   isLoading = signal<boolean>(true);
   games = signal<Game[] | undefined>(undefined);
   next = signal<string>('');
@@ -78,7 +68,7 @@ export class HomeComponent implements OnInit {
   constructor() {
     // Automatically fetch games whenever query state changes
     effect(() => {
-      const { sort, platform, search, genre } = this.gameQuery();
+      const { sort, platform, search, genre } = this.gameQueryStore.gameQuery();
 
       // Don’t trigger before init or if query is incomplete
       if (!sort) return;
@@ -92,29 +82,26 @@ export class HomeComponent implements OnInit {
       );
     });
   }
+
   ngOnInit(): void {
-    //ANOTHER WAY TO RETRIEVE QUERY PARAMS USING OBSERVABLES
-
-    /*const querySub = this.activatedRoute.queryParams.subscribe((params) => {
-      const platformFromUrl = params['platform'] || '';
-      this.platform = platformFromUrl;
+    const querySub = this.activatedRoute.queryParams.subscribe((params) => {
+      const platformFromUrl =
+        params['platform'] || ''; /*check from the params if any platform 
+                                                or search is selected*/
+      //this.platform = platformFromUrl; //set the selected platform if any
       const searchTerm = params['gameSearch'] || undefined;
-      //this.search.set(searchTerm); 
-      // const genreFromUrl =params['genre'] || undefined;
-      this.gameQuery.update((state) => ({
-        ...state,
-        platform: platformFromUrl,
-        serach: searchTerm,
-        genre: genreFromUrl,
-      }));
-    });  */
+      //this.search.set(searchTerm);
+      const genreFromUrl = params['genre'] || undefined;
 
-    this.gameQuery.update((state) => ({
-      ...state,
-      platform: this.platform() || '',
-      serach: this.search(),
-      genre: this.genre() || '',
-    }));
+      const current = this.gameQueryStore.gameQuery();
+
+      this.gameQueryStore.setQuery({
+        ...current,
+        platform: platformFromUrl,
+        search: searchTerm,
+        genre: genreFromUrl,
+      });
+    });
 
     const platformSub = this.gameService
       .getPlatforms('Cannot retrieve platforms')
@@ -127,6 +114,7 @@ export class HomeComponent implements OnInit {
       });
 
     this.destroRef.onDestroy(() => {
+      querySub.unsubscribe();
       platformSub.unsubscribe();
     });
   }
@@ -169,18 +157,17 @@ export class HomeComponent implements OnInit {
   }
 
   onSortOrPlatformChange() {
-    this.gameQuery.update((state) => ({
-      ...state,
-      sort: this.selectedSort,
-      platform: this.platformSelected,
-    }));
-    this.selectedPlatform.set(this.platformName(this.gameQuery().platform));
+    const current = this.gameQueryStore.gameQuery();
+
+    this.gameQueryStore.setQuery({
+      ...current,
+      sort: this.sort,
+      platform: this.platform,
+    });
+    this.selectedPlatform.set(this.platformName(this.platform));
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
-      queryParams: {
-        platform: this.platformSelected || null,
-        sort: this.selectedSort || null,
-      },
+      queryParams: { platform: this.platform || null },
       queryParamsHandling: 'merge', // merge with existing query params
       replaceUrl: true, // optional, avoids adding to browser history
     });
@@ -192,29 +179,31 @@ export class HomeComponent implements OnInit {
   }
 
   onSelectGenre(genre: Genre) {
-    this.gameQuery.update((state) => ({
-      ...state,
+    const current = this.gameQueryStore.gameQuery();
+
+    this.gameQueryStore.setQuery({
+      ...current,
       genre: genre.slug,
-    }));
+    });
   }
 
   onLoadMore() {
     this.searchGames(
       this.next(),
-      this.gameQuery().sort,
-      this.gameQuery().platform || undefined,
+      this.gameQueryStore.gameQuery().sort,
+      this.gameQueryStore.gameQuery().platform || undefined,
       undefined,
-      this.gameQuery().genre || undefined
+      this.gameQueryStore.gameQuery().genre || undefined
     );
   }
 
   onPreviousPage() {
     this.searchGames(
       this.previous(),
-      this.gameQuery().sort,
-      this.gameQuery().platform || undefined,
+      this.gameQueryStore.gameQuery().sort,
+      this.gameQueryStore.gameQuery().platform || undefined,
       undefined,
-      this.gameQuery().genre || undefined
+      this.gameQueryStore.gameQuery().genre || undefined
     );
   }
 

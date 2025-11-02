@@ -8,6 +8,7 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
+import { GameQueryStore } from '../../stores/gameQuery.store';
 
 @Component({
   selector: 'app-genre-menu-component',
@@ -22,6 +23,7 @@ export class GenreMenuComponent {
   selectedGenre = output<Genre>();
   private activatedRoute = inject(ActivatedRoute);
   private router = inject(Router);
+  private gameQueryStore = inject(GameQueryStore);
 
   ngOnInit(): void {
     const subscription = this.gameService
