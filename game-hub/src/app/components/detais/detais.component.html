@@ -1,3 +1,8 @@
+@if(isLoading()) {
+      <div class="flex items-center justify-center h-screen -mt-20 ">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>}
+@else {
 <div class="lg:grid lg:grid-cols-2 gap-[60px] mt-[60px] px-[20px] flex flex-col bg-gradient-to-r from-zinc-900 via-gray-500 to-zinc-700">
   <div class="flex flex-col gap-[20px]">
     <h1 class="text-white font-sans font-bold text-4xl">{{details()?.name}}</h1>
@@ -50,3 +55,4 @@
     </div>
   </div>
 </div>
+}

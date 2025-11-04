@@ -11,11 +11,12 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { GameDetails, Screenshots, Trailer } from '../../../models/game.model';
 import { CriticScoreComponent } from '../critic-score-component/critic-score-component';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   standalone: true,
   selector: 'app-detais',
-  imports: [CommonModule, CriticScoreComponent],
+  imports: [CommonModule, CriticScoreComponent, MatProgressSpinner],
   templateUrl: './detais.component.html',
   styleUrl: './detais.component.css',
 })
@@ -31,33 +32,28 @@ export class DetailsComponent implements OnInit {
   id = signal<string>('');
   color = signal('');
   showLess = signal<boolean>(true);
+  isLoading = signal<boolean>(false);
 
   ngOnInit() {
-    const subscription = this.activatedRoute.params.subscribe(
-      (params: Params) => {
-        //this.id.set(params['id']); alternative way to get the id from url and set it to the component 
-        if (this.gameId()) {
-          this.searchGameDetails(this.gameId());
-          this.searchGameTrailers(this.gameId());
-          this.searchGameScreenshots(this.gameId());
-        }
+    //this.id.set(params['id']); alternative way to get the id from url and set it to the component
+    if (this.gameId()) {
+      this.searchGameDetails(this.gameId());
+      this.searchGameTrailers(this.gameId());
+      this.searchGameScreenshots(this.gameId());
+    }
 
-        console.log(this.gameId());
-      }
-    );
-
-    this.destroRef.onDestroy(() => {
-      subscription.unsubscribe();
-    });
+    console.log(this.gameId());
   }
 
   searchGameDetails(id: string): void {
+    this.isLoading.set(true);
     const subscription = this.gameService
       .getGameDetails(this.gameId(), 'Cannot retrieve game details')
       .subscribe({
         next: (resData) => {
           this.details.set(resData);
           this.setColor();
+          this.isLoading.set(false);
           console.log(this.details());
         },
         error: (error: Error) => {
@@ -71,11 +67,13 @@ export class DetailsComponent implements OnInit {
   }
 
   searchGameTrailers(id: string): void {
+    this.isLoading.set(true);
     const subscription = this.gameService
       .getGameTrailers(id, 'Cannot retrieve game details')
       .subscribe({
         next: (resData) => {
           this.trailers.set(resData);
+          this.isLoading.set(false);
           console.log('Trailers', this.trailers());
         },
         error: (error: Error) => {
@@ -89,11 +87,13 @@ export class DetailsComponent implements OnInit {
   }
 
   searchGameScreenshots(id: string): void {
+    this.isLoading.set(true);
     const subscription = this.gameService
       .getGameScreenshots(id, 'Cannot retrieve game screenshots')
       .subscribe({
         next: (resData) => {
           this.screenshots.set(resData);
+          this.isLoading.set(false);
           console.log('Screenshots', this.screenshots());
         },
         error: (error: Error) => {
