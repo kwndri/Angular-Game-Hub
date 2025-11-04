@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
@@ -17,11 +17,16 @@ export class Authervice {
   private _isLoggedIn = signal<boolean>(false);
   readonly isLoggedIn = this._isLoggedIn.asReadonly();
   router = inject(Router);
+  isAuthenticated = computed(() => this._isLoggedIn());
 
   constructor() {
     // Sync token with signal on startup
     const token = localStorage.getItem('token');
-    this._isLoggedIn.set(!!token);
+    if (token) {
+      this._isLoggedIn.set(!!token);
+    } else {
+      this.logOut();
+    }
   }
 
   onSubmit(userName: string, password: string) {
@@ -57,10 +62,6 @@ export class Authervice {
 
   saveToken(token: string) {
     localStorage.setItem('token', token);
-  }
-
-  isAuthenticated() {
-    return this._isLoggedIn();
   }
 
   logOut() {

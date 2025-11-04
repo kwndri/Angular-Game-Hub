@@ -35,13 +35,15 @@ export class AuthService {
   readonly isAuthenticated = computed(() => !!this._refreshToken() && !!this.userStore.user());
 
   constructor() {
-    // 1️⃣ Startup: fetch user if accessToken exists
-    if (this._accessToken()) {
-      this.fetchUserInfo();
-    } else if (this._refreshToken()) {
-      // 2️⃣ No accessToken but refreshToken exists → refresh token first
-      this.refreshAccessToken();
-    }
+  const refresh = this._refreshToken();
+
+  if (refresh) {
+    // Startup: refresh access token once, then fetch user info
+    this.refreshAccessToken(true);
+  } else {
+    // No refresh token → logout
+    this.logOut();
+  }
 
     // 3️⃣ Auto logout if refreshToken disappears
     effect(() => {
@@ -53,7 +55,7 @@ export class AuthService {
 
     // 4️⃣ Auto-refresh access token every 15 minutes
     effect((onCleanup) => {
-      if (!this._refreshToken()) return;
+      if (!this._refreshToken(false)) return;
 
       const intervalId = setInterval(() => {
         this.refreshAccessToken();
@@ -62,14 +64,7 @@ export class AuthService {
       onCleanup(() => clearInterval(intervalId));
     });
 
-    // 5️⃣ Auto-fetch user info if accessToken exists but user missing
-    effect(() => {
-      const token = this._accessToken();
-      const user = this.userStore.user();
-      if (token && !user) {
-        this.fetchUserInfo();
-      }
-    });
+   
   }
 
   // 🔹 Login method
@@ -94,24 +89,26 @@ export class AuthService {
   }
 
   // 🔹 Refresh access token
-  private refreshAccessToken() {
-    const refresh = this._refreshToken();
-    if (!refresh) return;
+  private refreshAccessToken(fetchUser: boolean = false) {
+  const refresh = this._refreshToken();
+  if (!refresh) return;
 
-    this.http.post<RefreshResponse>('/auth/refresh', { refreshToken: refresh }).subscribe({
-      next: (res) => {
-        this._accessToken.set(res.accessToken);
-        if (res.refreshToken) {
-          this._refreshToken.set(res.refreshToken);
-          localStorage.setItem('refresh_token', res.refreshToken);
-        }
-        // fetchUserInfo effect will automatically run
-      },
-      error: (err) => {
-        console.error('Token refresh failed:', err);
-        this.logOut();
-      },
-    });
+  this.http.post<RefreshResponse>('/auth/refresh', { refreshToken: refresh }).subscribe({
+    next: (res) => {
+      this._accessToken.set(res.accessToken);
+
+      if (res.refreshToken) {
+        this._refreshToken.set(res.refreshToken);
+        localStorage.setItem('refresh_token', res.refreshToken);
+      }
+
+      if (fetchUser) {
+        this.fetchUserInfo();
+      }
+    },
+    error: () => this.logOut(),
+  });
+}
   }
 
   // 🔹 Fetch user info
