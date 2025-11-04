@@ -68,7 +68,16 @@ export class HomeComponent implements OnInit {
   constructor() {
     // Automatically fetch games whenever query state changes
     effect(() => {
-      const { sort, platform, search, genre } = this.gameQueryStore.gameQuery();
+      console.log(this.gameQueryStore.gameQuery());
+
+      const sort = this.gameQueryStore.gameQuery().sort;
+      const platform = this.gameQueryStore.gameQuery().platform;
+      const search = this.gameQueryStore.gameQuery().search;
+      const genre = this.gameQueryStore.gameQuery().genre;
+
+      this.selectedPlatform.set(
+        this.platformName(this.gameQueryStore.gameQuery().platform)
+      );
 
       // Don’t trigger before init or if query is incomplete
       if (!sort) return;
@@ -164,10 +173,13 @@ export class HomeComponent implements OnInit {
       sort: this.sort,
       platform: this.platform,
     });
-    this.selectedPlatform.set(this.platformName(this.platform));
+    this.selectedPlatform.set(
+      this.platformName(this.gameQueryStore.gameQuery().platform)
+    );
+
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
-      queryParams: { platform: this.platform || null },
+      queryParams: { platform: this.platform || null, sort: this.sort || null },
       queryParamsHandling: 'merge', // merge with existing query params
       replaceUrl: true, // optional, avoids adding to browser history
     });
@@ -184,6 +196,13 @@ export class HomeComponent implements OnInit {
     this.gameQueryStore.setQuery({
       ...current,
       genre: genre.slug,
+    });
+
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams: { genre: genre.slug },
+      queryParamsHandling: 'merge', // preserve other params like search/platform
+      replaceUrl: true,
     });
   }
 

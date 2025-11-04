@@ -1,5 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormControl,
+} from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Authervice } from '../../services/authService';
 import { GameQueryStore } from '../../stores/gameQuery.store';
@@ -7,32 +13,32 @@ import { GameQueryStore } from '../../stores/gameQuery.store';
 @Component({
   standalone: true,
   selector: 'app-searchbar',
-  imports: [FormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule],
   templateUrl: './searchbar.component.html',
   styleUrl: './searchbar.component.css',
 })
 export class SearchbarComponent {
-  authService = inject(Authervice);
-  router = inject(Router);
-  search = signal<string>('');
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
   private activatedRoute = inject(ActivatedRoute);
   private gameQueryStore = inject(GameQueryStore);
+  authService = inject(Authervice);
+  search = signal<string | undefined>('');
 
-  onSubmit(form: NgForm) {
-    this.search.set(form.value.search);
-    const current = this.gameQueryStore.gameQuery();
+  searchValue = signal<string | undefined>('');
+  private destroyRef = inject(DestroyRef);
+  form = new FormGroup({
+    search: new FormControl('', {}),
+  });
 
-    this.gameQueryStore.setQuery({
-      ...current,
-      platform: '',
-      search: this.search(),
-      genre: '',
-    });
+  onSubmit() {
+    this.search.set(this.form.value.search?.trim());
+    if (!this.search()) return;
 
-    this.router.navigate(['search', form.value.search]);
-    form.reset();
+    this.gameQueryStore.setSearchQuery(this.search() || '');
 
-    console.log(this.search());
+    // 4️⃣ Reset the form if needed
+    this.form.reset();
   }
 
   reloadCurrentRoute() {
