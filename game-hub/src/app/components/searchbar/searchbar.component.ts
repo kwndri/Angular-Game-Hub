@@ -37,6 +37,12 @@ export class SearchbarComponent {
 
     this.gameQueryStore.setSearchQuery(this.search() || '');
 
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams: { search: this.search() },
+      replaceUrl: true,
+    });
+
     // 4️⃣ Reset the form if needed
     this.form.reset();
   }

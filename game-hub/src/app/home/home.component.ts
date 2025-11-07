@@ -98,8 +98,12 @@ export class HomeComponent implements OnInit {
         params['platform'] || ''; /*check from the params if any platform 
                                                 or search is selected*/
       //this.platform = platformFromUrl; //set the selected platform if any
-      const searchTerm = params['gameSearch'] || undefined;
-      //this.search.set(searchTerm);
+
+      if (!platformFromUrl) {
+        this.platform = ''; //clear the value of platform selector when reseting the platform
+      }
+      const searchTerm = params['search'] || undefined;
+
       const genreFromUrl = params['genre'] || undefined;
 
       const current = this.gameQueryStore.gameQuery();
