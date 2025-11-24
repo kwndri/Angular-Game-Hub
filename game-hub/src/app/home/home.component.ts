@@ -73,8 +73,6 @@ export class HomeComponent implements OnInit {
       const search = this.gameQueryStore.gameQuery().search;
       const genre = this.gameQueryStore.gameQuery().genre;
 
-      this.setPlatformName();
-
       // Don’t trigger before init or if query is incomplete
       if (!sort) return;
 
@@ -119,6 +117,10 @@ export class HomeComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.platforms.set(res);
+          const platformId = this.gameQueryStore.gameQuery().platform;
+          if (platformId) {
+            this.selectedPlatform.set(this.platformName(platformId));
+          }
         },
 
         error: (err) => console.error(err),
@@ -239,7 +241,7 @@ export class HomeComponent implements OnInit {
     return '';
   }
 
-  setPlatformName() {
+  setPlatformName(platformId: string) {
     this.selectedPlatform.set(
       this.platformName(this.gameQueryStore.gameQuery().platform)
     );
