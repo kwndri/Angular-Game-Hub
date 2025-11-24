@@ -25,7 +25,7 @@ export class Gameservice {
     search?: string,
     genre?: string
   ) {
-    let params = new HttpParams().set('ordering', ordering);
+    let params = new HttpParams().set('ordering', ordering); //how to set params in an http request
 
     if (platform) {
       params = params.set('platforms', platform);

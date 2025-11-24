@@ -20,6 +20,7 @@ export class GenreMenuComponent {
   genres = signal<Genre[] | undefined>(undefined);
   private gameService = inject(Gameservice);
   private destroRef = inject(DestroyRef);
+  private error = signal<string>('');
   selectedGenre = output<Genre>();
   private activatedRoute = inject(ActivatedRoute);
   private router = inject(Router);
@@ -30,9 +31,12 @@ export class GenreMenuComponent {
       .getGenres('Cannot retrieve platforms')
       .subscribe({
         next: (res) => {
-          this.genres.set(res), console.log(this.genres());
+          this.genres.set(res);
         },
-        error: (err) => console.error(err),
+        error: (err) => {
+          console.log(err);
+          this.error.set(err);
+        },
       });
 
     this.destroRef.onDestroy(() => subscription.unsubscribe());

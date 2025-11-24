@@ -1,11 +1,5 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
-import {
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  Validators,
-  FormControl,
-} from '@angular/forms';
+import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Authervice } from '../../services/authService';
 import { GameQueryStore } from '../../stores/gameQuery.store';
@@ -18,7 +12,6 @@ import { GameQueryStore } from '../../stores/gameQuery.store';
   styleUrl: './searchbar.component.css',
 })
 export class SearchbarComponent {
-  private fb = inject(FormBuilder);
   private router = inject(Router);
   private activatedRoute = inject(ActivatedRoute);
   private gameQueryStore = inject(GameQueryStore);

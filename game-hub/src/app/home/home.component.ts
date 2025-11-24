@@ -61,23 +61,19 @@ export class HomeComponent implements OnInit {
   private destroRef = inject(DestroyRef);
   private authService = inject(Authervice);
   isAuthenticated = this.authService.isLoggedIn;
-  selectedGenre: Genre | undefined;
+  selectedGenre = signal<Genre | undefined>(undefined);
   selectedPlatform = signal('');
   genreName = input.required<string>();
 
   constructor() {
     // Automatically fetch games whenever query state changes
     effect(() => {
-      console.log(this.gameQueryStore.gameQuery());
-
       const sort = this.gameQueryStore.gameQuery().sort;
       const platform = this.gameQueryStore.gameQuery().platform;
       const search = this.gameQueryStore.gameQuery().search;
       const genre = this.gameQueryStore.gameQuery().genre;
 
-      this.selectedPlatform.set(
-        this.platformName(this.gameQueryStore.gameQuery().platform)
-      );
+      this.setPlatformName();
 
       // Don’t trigger before init or if query is incomplete
       if (!sort) return;
@@ -101,6 +97,8 @@ export class HomeComponent implements OnInit {
 
       if (!platformFromUrl) {
         this.platform = ''; //clear the value of platform selector when reseting the platform
+      } else {
+        this.platform = platformFromUrl;
       }
       const searchTerm = params['search'] || undefined;
 
@@ -196,7 +194,7 @@ export class HomeComponent implements OnInit {
 
   onSelectGenre(genre: Genre) {
     const current = this.gameQueryStore.gameQuery();
-
+    this.selectedGenre.set(genre);
     this.gameQueryStore.setQuery({
       ...current,
       genre: genre.slug,
@@ -239,6 +237,12 @@ export class HomeComponent implements OnInit {
     }
 
     return '';
+  }
+
+  setPlatformName() {
+    this.selectedPlatform.set(
+      this.platformName(this.gameQueryStore.gameQuery().platform)
+    );
   }
 }
 

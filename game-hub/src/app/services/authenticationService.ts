@@ -76,10 +76,8 @@ export class AuthService {
         this._refreshToken.set(res.refreshToken);
         localStorage.setItem('refresh_token', res.refreshToken);
 
-        this.fetchUserInfo(() => {
-          this.isLoading.set(false);
-          this.router.navigate(['/']); // redirect after successful login
-        });
+        this.fetchUserInfo()
+        this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Login failed:', err);
@@ -121,7 +119,7 @@ export class AuthService {
     }).subscribe({
       next: (user) => {
         this.userStore.setUser({ ...user, accessToken: token } as any);
-        this.router.navigate(['/']);
+        
       },
       error: (err) => {
         console.error('Failed to fetch user info:', err);
