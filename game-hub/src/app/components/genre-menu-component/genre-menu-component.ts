@@ -21,7 +21,6 @@ export class GenreMenuComponent {
   private gameService = inject(Gameservice);
   private destroRef = inject(DestroyRef);
   private error = signal<string>('');
-  selectedGenre = output<Genre>();
   private activatedRoute = inject(ActivatedRoute);
   private router = inject(Router);
   private gameQueryStore = inject(GameQueryStore);
@@ -43,7 +42,12 @@ export class GenreMenuComponent {
   }
 
   onClick(genre: Genre) {
-    this.selectedGenre.emit(genre);
+    const current = this.gameQueryStore.gameQuery();
+    this.gameQueryStore.setQuery({
+      ...current,
+      genre: genre.slug,
+    });
+
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
       queryParams: { genre: genre.slug || null },

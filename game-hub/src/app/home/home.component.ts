@@ -61,7 +61,6 @@ export class HomeComponent implements OnInit {
   private destroRef = inject(DestroyRef);
   private authService = inject(Authervice);
   isAuthenticated = this.authService.isLoggedIn;
-  selectedGenre = signal<Genre | undefined>(undefined);
   selectedPlatform = signal('');
   genreName = input.required<string>();
 
@@ -192,22 +191,6 @@ export class HomeComponent implements OnInit {
   onSelectGame(id: number) {
     console.log(id);
     this.router.navigate(['details', id.toString()]);
-  }
-
-  onSelectGenre(genre: Genre) {
-    const current = this.gameQueryStore.gameQuery();
-    this.selectedGenre.set(genre);
-    this.gameQueryStore.setQuery({
-      ...current,
-      genre: genre.slug,
-    });
-
-    this.router.navigate([], {
-      relativeTo: this.activatedRoute,
-      queryParams: { genre: genre.slug },
-      queryParamsHandling: 'merge', // preserve other params like search/platform
-      replaceUrl: true,
-    });
   }
 
   onLoadMore() {
